@@ -46,3 +46,8 @@ class PipelineStack(core.Stack):
                                          synth_action=synth_action,
                                          source_action=source_action,
                                          cloud_assembly_artifact=cloud_assembly_artifact)
+
+        pprod_env = core.Environment(account="927534600513", region="eu-central-1")
+        # pprod_props = core.StageProps(env=pprod_env)
+        pipeline_stage_pprod = PipelineStage(self, id="preprod", env=pprod_env)
+        pipeline.add_application_stage(pipeline_stage_pprod)
