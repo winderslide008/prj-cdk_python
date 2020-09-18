@@ -1,1 +1,9 @@
--e .
+aws-cdk.core
+aws-cdk.aws-iam
+aws-cdk.pipelines
+aws-cdk.aws-codepipeline
+aws-cdk.aws-events
+aws-cdk.aws-events-targets
+aws-cdk.aws-lambda
+aws-cdk.cloud-assembly-schema
+aws-cdk.region-info
