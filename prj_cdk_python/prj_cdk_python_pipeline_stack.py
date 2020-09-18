@@ -51,3 +51,7 @@ class PipelineStack(core.Stack):
         # pprod_props = core.StageProps(env=pprod_env)
         pipeline_stage_pprod = PipelineStage(self, id="preprod", env=pprod_env)
         pipeline.add_application_stage(pipeline_stage_pprod)
+
+        prod_env = core.Environment(account="582362266023", region="eu-central-1")
+        pipeline_stage_prod = PipelineStage(self, id="prod", env=prod_env)
+        pipeline.add_application_stage(pipeline_stage_prod)
