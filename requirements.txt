@@ -1,5 +1,6 @@
 aws-cdk.core
 aws-cdk.aws-iam
+aws-cdk.aws-rds
 aws-cdk.pipelines
 aws-cdk.aws-codepipeline
 aws-cdk.aws-events

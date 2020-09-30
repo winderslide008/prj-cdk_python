@@ -3,6 +3,7 @@ from aws_cdk import (
     aws_ec2 as ec2,
     aws_iam as iam,
     aws_ssm as ssm,
+    aws_rds as rds
 )
 
 from prj_cdk_python.prj_cdk_python_nested_stack import LambdaCronNestedStack
@@ -16,17 +17,20 @@ class PrjCdkPythonStack(core.Stack):
         # The code that defines your stack goes here
 
         # VPC
-        vpc = ec2.Vpc(self, "VPC", nat_gateways=0, subnet_configuration=[ec2.SubnetConfiguration(
-            name="public",
-            subnet_type=ec2.SubnetType.PUBLIC
-        )])
+        vpc = ec2.Vpc(self, "VPC",
+                      nat_gateways=1,
+                      subnet_configuration=[ec2.SubnetConfiguration(name="public", subnet_type=ec2.SubnetType.PUBLIC),
+                                            ec2.SubnetConfiguration(name="private",
+                                                                    subnet_type=ec2.SubnetType.PRIVATE)])
 
         # AMI
         amzn_linux = ec2.MachineImage.latest_amazon_linux()
 
         # Instance role and SSM Managed Policy
-        role = iam.Role(self, "InstanceSSM", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"))
-        role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name("service-role/AmazonEC2RoleforSSM"))
+        role = iam.Role(self, "InstanceSSM",
+                        assumed_by=iam.ServicePrincipal("ec2.amazonaws.com"))
+        role.add_managed_policy(iam.ManagedPolicy.from_aws_managed_policy_name(
+            "service-role/AmazonEC2RoleforSSM"))
 
         # Security Group
         sg = ec2.SecurityGroup(self, "SG",
@@ -45,7 +49,8 @@ class PrjCdkPythonStack(core.Stack):
 
         # Userdata to install nginx
         user_data = ec2.UserData.for_linux()
-        user_data.add_commands("yum install -y nginx", "chkconfig nginx on", "service nginx start")
+        user_data.add_commands("yum install -y nginx",
+                               "chkconfig nginx on", "service nginx start")
 
         # SSM
         env = "Preprod"
@@ -68,3 +73,12 @@ class PrjCdkPythonStack(core.Stack):
                                 )
         # Nested stack
         LambdaCronNestedStack(self, "not:a:stack:name")
+
+        # RDS
+        cluster = rds.DatabaseInstance(self, 'Database',
+                                       engine=rds.DatabaseInstanceEngine.postgres(
+                                           version=rds.PostgresEngineVersion.VER_12_3),
+                                       instance_type=ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3,
+                                                                         ec2.InstanceSize.SMALL),
+                                       master_username='paandrie',
+                                       vpc=vpc)
